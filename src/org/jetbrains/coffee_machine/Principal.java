@@ -3,61 +3,98 @@ package org.jetbrains.coffee_machine;
 import java.util.Scanner;
 
 public class Principal {
-	//Static variables
-    public static final Scanner scanner = new Scanner(System.in);
+    //Static variables
+	public static final Scanner scanner = new Scanner(System.in);
     public static Double qttWater = 400.0;
     public static Double qttMilk = 540.0;
     public static Double qttCoffeeBeans = 120.0;
     public static Integer qttDisposableCups = 9;
     public static Double storedMoney = 550.00;
+    public static boolean isAvailable = true;
     //Main
     public static void main(String[] args) {
         //Required variables
         String instruction;
         //Execution
-        displaySupplyInformation();
-        //Identifying action to be taken
-        System.out.println("Informe a aÁ„o desejada (comprar, repor, sacar):");
-        instruction = scanner.next();
-        executeSelectedInstruction(instruction);
+        //identifying action to be taken
+        do {
+            System.out.println("Informe a a√ß√£o desejada (comprar, repor, retirada, recursos, sair):");
+            instruction = scanner.next();
+            executeSelectedInstruction(instruction);
+        } while (isAvailable);
     }
     //Methods
     /**
-     * Method used to calculate the amount of coffee the machine can brew
-     * @param water amount of ml water the machine has
-     * @param milk amount of ml milk the machine has
-     * @param coffee amount of g of coffe beans the machine has
-     * @return qtdCanBeProduce amount of cups that can be produced
+     * Method responsible for checking available resources before preparing coffee
+     * @param typeCoffee
+     * @return true if can produce a cup coffee
      */
-    public static Integer verifyCapacityProduction(int water, int milk, int coffee){
+    public static boolean canIProduce (String typeCoffee){
         //Local variables
-        Integer qtdCanBeProduce = 0;
-        boolean canIProduce = true;
-        //Processing
-        do {
-            water -= 200; //amount of water needed per cup
-            milk -= 50; //amount of milk needed per cup
-            coffee -= 15; //amount of coffee needed per cup
-            //Can i produce ?
-            if (water >= 0 && milk >= 0 && coffee >= 0) {
-                qtdCanBeProduce++;
-            }else{
-                canIProduce = false;
+        Integer waterNeeded = -1;
+        Integer coffeeNeeded = -1;
+        Integer milkNeeded = -1;
+        //filling variables ‚Äãaccording to the type of coffee chosen
+        switch (typeCoffee) {
+            case "1":
+                waterNeeded = 250;
+                coffeeNeeded = 16;
+                break;
+            //2 - latte
+            case "2":
+                waterNeeded = 350;
+                milkNeeded = 75;
+                coffeeNeeded = 20;
+                break;
+            //3 - cappuccino
+            case "3":
+                waterNeeded = 200;
+                milkNeeded  = 100;
+                coffeeNeeded = 12;
+                break;
+            //back - return to main menu
+            case "voltar":
+                break;
+            default:
+                System.out.println("Op√ß√£o inv√°lida");
+                break;
+        }
+        //validations
+        if (waterNeeded <= qttWater && coffeeNeeded <= qttCoffeeBeans && milkNeeded <= qttMilk && qttDisposableCups >= 1) {
+            System.out.println("Temos os recursos necess√°rios, estamos preparando seu caf√©!");
+            return true;
+        } else {
+            System.out.print("Desculpe, n√£o temos ");
+            //without water?
+            if (waterNeeded > qttWater) {
+                System.out.print("√°gua ");
             }
-        } while (canIProduce);
-        //Returns
-        return qtdCanBeProduce;
+            //without coffee?
+            if (coffeeNeeded > qttCoffeeBeans) {
+                System.out.print("caf√© ");
+            }
+            //without milk?
+            if (milkNeeded > qttMilk) {
+                System.out.print("leite ");
+            }
+            //without cups?
+            if (qttDisposableCups < 1) {
+                System.out.print("copos descart√°veis ");
+            }
+            System.out.print("!\n");
+        }
+        return false;
     }
 
     /**
      * Method used to show current supply information
      */
     public static void displaySupplyInformation(){
-        System.out.println("\nSua Coffee Machine tem:");
-        System.out.println(qttWater + " ml(s) de ·gua");
-        System.out.println(qttMilk + " ml(s) de leite");
-        System.out.println(qttCoffeeBeans + " (g) de cafÈ em gr„o");
-        System.out.println(qttDisposableCups + " copos descart·veis disponÌveis");
+        System.out.println("\nSua coffee machine tem:");
+        System.out.println(qttWater + " ml de √°gua");
+        System.out.println(qttMilk + " ml de leite");
+        System.out.println(qttCoffeeBeans + " g de caf√©");
+        System.out.println(qttDisposableCups + " copo(s)");
         System.out.println("R$ " + storedMoney + " em caixa");
     }
 
@@ -68,54 +105,60 @@ public class Principal {
     public static void executeSelectedInstruction(String selectedInstruction){
         switch (selectedInstruction) {
             case "comprar":
-                System.out.println("Qual tipo de cafÈ vocÍ deseja? 1 - Expresso, 2 - CafÈ com leite, 3 - Cappuccino:");
-                int option = scanner.nextInt();
-                buyCoffee(option);
-                displaySupplyInformation();
+            	System.out.println("Qual tipo de caf√© voc√™ deseja? 1 - Expresso, 2 - Caf√© com leite, 3 - Cappuccino, voltar - Para retornar ao menu principal :");
+                String option = scanner.next();
+                if (canIProduce(option)) {
+                    buyCoffee(option);
+                }
                 break;
             case "repor":
                 replenishSupplies();
-                displaySupplyInformation();
                 break;
-            case "sacar":
+            case "retirada":
                 takeStoredMoney();
+                break;
+            case "recursos":
                 displaySupplyInformation();
                 break;
-            default: System.out.println("OpÁ„o inv·lida");
+            case "sair":
+                isAvailable = false;
+                break;
+            default: System.out.println("Op√ß√£o inv√°lida");
                 break;
         }
     }
 
     /**
      * Method used to buy a coffee and update the supply level after purchase
-     * @param typeCoffee
+     * @param typeCoffee type of coffee chosen
      */
-    public static void buyCoffee(int typeCoffee) {
-        //Decreasing quantity of cups
-        qttDisposableCups --;
+    public static void buyCoffee(String typeCoffee) {
         //Updating the supply level according to the type of chosen coffee
         switch (typeCoffee) {
             //1 - espresso
-            case 1:
+            case "1":
                 qttWater -= 250;
                 qttCoffeeBeans -= 16;
                 storedMoney += 4;
+                qttDisposableCups --;
                 break;
             //2 - latte
-            case 2:
+            case "2":
                 qttWater -= 350;
                 qttMilk -= 75;
                 qttCoffeeBeans -= 20;
                 storedMoney += 7;
+                qttDisposableCups --;
                 break;
             //3 - cappuccino
-            case 3:
+            case "3":
                 qttWater -= 200;
                 qttMilk -= 100;
                 qttCoffeeBeans -= 12;
                 storedMoney += 6;
+                qttDisposableCups --;
                 break;
-            default: System.out.println("OpÁ„o inv·lida");
+            default: System.out.println("Op√ß√£o inv√°lida");
                 break;
         }
     }
@@ -124,13 +167,13 @@ public class Principal {
      * Method responsible for replenishing machine supplies
      */
     public static void replenishSupplies(){
-        System.out.println("Informe quantos ml(s) de ·gua ir· adicionar:");
+        System.out.println("Informe quantos ml(s) de √°gua ir√° adicionar:");
         qttWater += scanner.nextDouble();
-        System.out.println("Informe quantos ml(s) de leite ir· adicionar:");
+        System.out.println("Informe quantos ml(s) de leite ir√° adicionar:");
         qttMilk += scanner.nextDouble();
-        System.out.println("Informe quantos g(s) de gr„os de cafÈ ir· adicionar:");
+        System.out.println("Informe quantos g(s) de gr√£os de caf√© ir√° adicionar:");
         qttCoffeeBeans += scanner.nextDouble();
-        System.out.println("Informe quantos copos descart·veis ir· adicionar");
+        System.out.println("Informe quantos copos descart√°veis ir√° adicionar");
         qttDisposableCups += scanner.nextInt();
     }
 
@@ -138,7 +181,7 @@ public class Principal {
      *Method used to withdraw money stored in the coffee machine
      */
     public static void takeStoredMoney(){
-        System.out.println("VocÍ retirou R$ " + storedMoney);
+        System.out.println("Voc√™ retirou R$ " + storedMoney);
         storedMoney = 0.00;
     }
 }
