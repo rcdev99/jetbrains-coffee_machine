@@ -4,7 +4,7 @@ import java.util.Scanner;
 
 public class Principal {
     //Static variables
-	 public static final Scanner scanner = new Scanner(System.in);
+	public static final Scanner scanner = new Scanner(System.in);
     public static Double qttWater = 400.0;
     public static Double qttMilk = 540.0;
     public static Double qttCoffeeBeans = 120.0;
@@ -24,7 +24,11 @@ public class Principal {
         } while (isAvailable);
     }
     //Methods
-
+    /**
+     * Method responsible for checking available resources before preparing coffee
+     * @param typeCoffee
+     * @return true if can produce a cup coffee
+     */
     public static boolean canIProduce (String typeCoffee){
         //Local variables
         Integer waterNeeded = -1;
