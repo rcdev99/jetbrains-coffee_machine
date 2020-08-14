@@ -9,4 +9,5 @@ Até o momento de conclusão deste primeiro projeto (14/08/2020), foram visitado
 a linguagem de programação Java, 243 atividades realizadas, 15 problemas diários resolvidos (A plataforma disponibliza um por dia)
 e 1 projeto concluído (Coffee Machine).
 
+![coffeeMachine_end](https://user-images.githubusercontent.com/51911137/90268793-ee3b9c00-de2d-11ea-95cc-3f12bf9ed459.png)
 
